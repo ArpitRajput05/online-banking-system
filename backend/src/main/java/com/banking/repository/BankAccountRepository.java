@@ -1,0 +1,10 @@
+package com.banking.repository;
+import com.banking.entity.BankAccount;
+import com.banking.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+public interface BankAccountRepository extends JpaRepository<BankAccount, Long> {
+    Optional<BankAccount> findByUser(User user);
+    Optional<BankAccount> findByAccountNumber(String accountNumber);
+    boolean existsByAccountNumber(String accountNumber);
+}
