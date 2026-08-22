@@ -36,7 +36,7 @@ const BeneficiaryPage: React.FC = () => {
         accountNumber,
         bankName
       } as BeneficiaryRequest);
-      setSuccess('Beneficiary added successfully!');
+      setSuccess('Beneficiary added successfully.');
       setName(''); setAccountNumber(''); setBankName('');
       fetchBeneficiaries();
     } catch (err: any) {
@@ -47,7 +47,7 @@ const BeneficiaryPage: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to remove this beneficiary?')) return;
+    if (!window.confirm('Remove this beneficiary?')) return;
     try {
       await api.delete(`/api/beneficiaries/${id}`);
       setBeneficiaries(prev => prev.filter(b => b.id !== id));
@@ -61,7 +61,7 @@ const BeneficiaryPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <h2>?? Beneficiary Management</h2>
+      <h2>Beneficiary Management</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
@@ -70,19 +70,22 @@ const BeneficiaryPage: React.FC = () => {
           <h3>Add Beneficiary</h3>
           <form onSubmit={handleAdd}>
             <div className="form-group">
-              <label>Beneficiary Name *</label>
-              <input type="text" className="form-control" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} required />
+              <label>Full Name</label>
+              <input type="text" className="form-control" placeholder="Beneficiary full name"
+                value={name} onChange={e => setName(e.target.value)} required />
             </div>
             <div className="form-group">
-              <label>Account Number *</label>
-              <input type="text" className="form-control" placeholder="10-digit account number" value={accountNumber} onChange={e => setAccountNumber(e.target.value)} required />
+              <label>Account Number</label>
+              <input type="text" className="form-control" placeholder="10-digit account number"
+                value={accountNumber} onChange={e => setAccountNumber(e.target.value)} required />
             </div>
             <div className="form-group">
-              <label>Bank Name *</label>
-              <input type="text" className="form-control" placeholder="e.g., SecureBank" value={bankName} onChange={e => setBankName(e.target.value)} required />
+              <label>Bank Name</label>
+              <input type="text" className="form-control" placeholder="e.g., SecureBank"
+                value={bankName} onChange={e => setBankName(e.target.value)} required />
             </div>
             <button type="submit" className="btn btn-primary full-width" disabled={adding}>
-              {adding ? 'Adding...' : '+ Add Beneficiary'}
+              {adding ? 'Adding...' : 'Add Beneficiary'}
             </button>
           </form>
         </div>
@@ -97,10 +100,12 @@ const BeneficiaryPage: React.FC = () => {
                 <div key={b.id} className="beneficiary-item">
                   <div className="beneficiary-info">
                     <strong>{b.beneficiaryName}</strong>
-                    <p className="account-number">{b.accountNumber}</p>
-                    <small className="text-muted">{b.bankName}</small>
+                    <p>{b.accountNumber}</p>
+                    <small>{b.bankName}</small>
                   </div>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(b.id)}>Remove</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(b.id)}>
+                    Remove
+                  </button>
                 </div>
               ))}
             </div>

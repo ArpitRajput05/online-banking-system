@@ -710,3 +710,38 @@ img { max-width: 100%; }
   .tab-container { width: 100%; }
   .tab-btn { flex: 1; text-align: center; }
 }
+
+/* ─── Auth logo text (replaces emoji) ─── */
+.auth-logo-text {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 4px 14px rgba(30,58,138,0.35);
+  letter-spacing: -0.5px;
+}
+
+/* ─── Navbar register button ─── */
+.navbar-register-btn {
+  color: #fff !important;
+  background: rgba(255,255,255,0.18);
+  padding: 0.4rem 1rem !important;
+  border-radius: 6px;
+  text-decoration: none !important;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.navbar-register-btn:hover {
+  background: rgba(255,255,255,0.28) !important;
+  text-decoration: none !important;
+}
+
+/* ─── Badge light (account card) ─── */
+.badge-light { background: rgba(255,255,255,0.2); color: #fff; }

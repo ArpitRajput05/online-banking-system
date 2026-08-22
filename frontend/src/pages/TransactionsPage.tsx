@@ -13,7 +13,7 @@ const TransactionsPage: React.FC = () => {
       try {
         const response = await api.get<ApiResponse<Transaction[]>>('/api/transactions/my');
         setTransactions(response.data.data || []);
-      } catch (err: any) {
+      } catch {
         setError('Failed to load transaction history.');
       } finally {
         setLoading(false);
@@ -23,27 +23,21 @@ const TransactionsPage: React.FC = () => {
   }, []);
 
   const getTypeBadge = (type: string) => {
-    switch (type) {
-      case 'TRANSFER': return 'badge badge-info';
-      case 'CREDIT':   return 'badge badge-success';
-      case 'DEBIT':    return 'badge badge-danger';
-      default:         return 'badge';
-    }
+    if (type === 'CREDIT')   return 'badge badge-success';
+    if (type === 'TRANSFER') return 'badge badge-info';
+    return 'badge badge-danger';
   };
-
-  const getAmountClass = (type: string) =>
-    type === 'CREDIT' ? 'amount-credit' : 'amount-debit';
 
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="page-container">
-      <h2>?? Transaction History</h2>
+      <h2>Transaction History</h2>
       {error && <div className="alert alert-danger">{error}</div>}
 
       {transactions.length === 0 ? (
         <div className="card empty-state">
-          <p>?? No transactions yet. Make your first transfer!</p>
+          <p>No transactions yet. Make your first transfer!</p>
         </div>
       ) : (
         <div className="card">
@@ -51,7 +45,7 @@ const TransactionsPage: React.FC = () => {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Date</th>
+                  <th>Date & Time</th>
                   <th>Type</th>
                   <th>Description</th>
                   <th>To / From</th>
@@ -66,10 +60,10 @@ const TransactionsPage: React.FC = () => {
                     <td><span className={getTypeBadge(tx.type)}>{tx.type}</span></td>
                     <td>{tx.description || '—'}</td>
                     <td className="account-number">{tx.receiverAccountNumber}</td>
-                    <td className={getAmountClass(tx.type)}>
-                      {tx.type === 'CREDIT' ? '+' : '-'}?{Number(tx.amount).toFixed(2)}
+                    <td className={tx.type === 'CREDIT' ? 'amount-credit' : 'amount-debit'}>
+                      {tx.type === 'CREDIT' ? '+' : '-'} Rs.{Number(tx.amount).toFixed(2)}
                     </td>
-                    <td>?{Number(tx.balanceAfter).toFixed(2)}</td>
+                    <td>Rs.{Number(tx.balanceAfter).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

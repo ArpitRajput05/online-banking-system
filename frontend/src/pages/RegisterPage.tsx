@@ -17,19 +17,12 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      const response = await api.post<ApiResponse<AuthResponse>>('/api/auth/register', {
-        username,
-        email,
-        password,
-      });
-      // Backend wraps in ApiResponse: { success, message, data: AuthResponse }
+      const response = await api.post<ApiResponse<AuthResponse>>('/api/auth/register', { username, email, password });
       login(response.data.data);
       navigate('/dashboard');
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Registration failed. Please try again.';
-      setError(msg);
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -38,61 +31,35 @@ const RegisterPage: React.FC = () => {
   return (
     <div className="auth-container">
       <div className="card auth-card">
-        <div className="auth-logo">??</div>
+        <div className="auth-logo-text">SB</div>
         <h2>Create Account</h2>
-        <p className="subtitle">Join SecureBank today — get ?10,000 welcome balance!</p>
+        <p className="subtitle">Join SecureBank — get Rs. 10,000 welcome balance</p>
 
         {error && <div className="alert alert-danger">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              className="form-control"
-              placeholder="Choose a username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              minLength={3}
-            />
+            <input type="text" id="username" className="form-control" placeholder="Choose a username"
+              value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              className="form-control"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <label htmlFor="email">Email Address</label>
+            <input type="email" id="email" className="form-control" placeholder="Enter your email"
+              value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
-
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              className="form-control"
-              placeholder="Min 6 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
+            <input type="password" id="password" className="form-control" placeholder="Minimum 6 characters"
+              value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
           </div>
-
           <button type="submit" className="btn btn-primary full-width" disabled={loading}>
-            {loading ? 'Creating Account...' : 'Register'}
+            {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
         <div className="auth-links">
-          <p>Already have an account? <Link to="/login">Login here</Link></p>
+          <p>Already have an account? <Link to="/login">Sign in here</Link></p>
         </div>
       </div>
     </div>

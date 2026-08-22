@@ -30,7 +30,7 @@ const DashboardPage: React.FC = () => {
   return (
     <div className="page-container">
       <div className="dashboard-header">
-        <h1>Welcome back, {user?.username}! ??</h1>
+        <h1>Welcome back, {user?.username}</h1>
         <p className="text-muted">Here is your account overview</p>
       </div>
 
@@ -40,17 +40,17 @@ const DashboardPage: React.FC = () => {
         <div className="dashboard-grid">
           <div className="account-card">
             <div className="account-card-header">
-              <h3>?? {account.accountType} Account</h3>
-              <span className="badge badge-success">Active</span>
+              <h3>{account.accountType} ACCOUNT</h3>
+              <span className="badge badge-light">Active</span>
             </div>
             <div className="account-balance">
-              <span className="currency-symbol">?</span>
+              <span className="currency-symbol">Rs.</span>
               <span className="amount">{Number(account.balance).toFixed(2)}</span>
             </div>
             <div className="account-details-bottom">
               <div>
                 <p className="label">Account Number</p>
-                <p className="value account-number">{account.accountNumber}</p>
+                <p className="value">{account.accountNumber}</p>
               </div>
               <div>
                 <p className="label">Member Since</p>
@@ -63,13 +63,13 @@ const DashboardPage: React.FC = () => {
             <h3>Quick Actions</h3>
             <div className="action-buttons">
               <Link to="/transfer" className="btn btn-primary full-width mb-1">
-                ?? Transfer Money
+                Transfer Money
               </Link>
               <Link to="/transactions" className="btn btn-secondary full-width mb-1">
-                ?? View Transactions
+                View Transactions
               </Link>
               <Link to="/beneficiaries" className="btn btn-secondary full-width">
-                ?? Manage Beneficiaries
+                Manage Beneficiaries
               </Link>
             </div>
           </div>

@@ -16,13 +16,8 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      const response = await api.post<ApiResponse<AuthResponse>>('/api/auth/login', {
-        username,
-        password,
-      });
-      // Backend wraps in ApiResponse: { success, message, data: AuthResponse }
+      const response = await api.post<ApiResponse<AuthResponse>>('/api/auth/login', { username, password });
       login(response.data.data);
       navigate('/dashboard');
     } catch (err: any) {
@@ -35,41 +30,25 @@ const LoginPage: React.FC = () => {
   return (
     <div className="auth-container">
       <div className="card auth-card">
-        <div className="auth-logo">??</div>
+        <div className="auth-logo-text">SB</div>
         <h2>Welcome to SecureBank</h2>
-        <p className="subtitle">Please login to your account</p>
+        <p className="subtitle">Please sign in to your account</p>
 
         {error && <div className="alert alert-danger">{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              id="username"
-              className="form-control"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
+            <input type="text" id="username" className="form-control" placeholder="Enter your username"
+              value={username} onChange={(e) => setUsername(e.target.value)} required />
           </div>
-
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              className="form-control"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <input type="password" id="password" className="form-control" placeholder="Enter your password"
+              value={password} onChange={(e) => setPassword(e.target.value)} required />
           </div>
-
           <button type="submit" className="btn btn-primary full-width" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 

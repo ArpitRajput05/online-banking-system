@@ -13,13 +13,15 @@ const Navbar: React.FC = () => {
   };
 
   const isActive = (path: string) =>
-    location.pathname === path ? { color: '#fff', background: 'rgba(255,255,255,0.15)' } : {};
+    location.pathname === path
+      ? { color: '#fff', background: 'rgba(255,255,255,0.15)' }
+      : {};
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          ?? SecureBank
+          SecureBank
         </Link>
 
         <div className="navbar-links">
@@ -30,9 +32,7 @@ const Navbar: React.FC = () => {
               <Link to="/transactions"  style={isActive('/transactions')}>Transactions</Link>
               <Link to="/beneficiaries" style={isActive('/beneficiaries')}>Beneficiaries</Link>
               {isAdmin && (
-                <Link to="/admin" className="admin-link" style={isActive('/admin')}>
-                  Admin
-                </Link>
+                <Link to="/admin" className="admin-link" style={isActive('/admin')}>Admin</Link>
               )}
               <div className="navbar-user">
                 <span className="user-greeting">Hi, <span>{user?.username}</span></span>
@@ -42,9 +42,7 @@ const Navbar: React.FC = () => {
           ) : (
             <>
               <Link to="/login" style={isActive('/login')}>Login</Link>
-              <Link to="/register" style={{ ...isActive('/register'), background: 'rgba(255,255,255,0.18)', padding: '0.4rem 1rem', borderRadius: '6px' }}>
-                Register
-              </Link>
+              <Link to="/register" className="navbar-register-btn">Register</Link>
             </>
           )}
         </div>

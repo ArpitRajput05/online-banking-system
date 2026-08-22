@@ -19,7 +19,7 @@ const AdminDashboardPage: React.FC = () => {
         ]);
         setUsers(usersRes.data.data || []);
         setAuditLogs(auditRes.data.data || []);
-      } catch (err: any) {
+      } catch {
         setError('Failed to load admin data.');
       } finally {
         setLoading(false);
@@ -32,15 +32,17 @@ const AdminDashboardPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <h2>?? Admin Dashboard</h2>
+      <h2>Admin Dashboard</h2>
       {error && <div className="alert alert-danger">{error}</div>}
 
       <div className="tab-container">
-        <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-          ?? Users ({users.length})
+        <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}>
+          Users ({users.length})
         </button>
-        <button className={`tab-btn ${activeTab === 'audit' ? 'active' : ''}`} onClick={() => setActiveTab('audit')}>
-          ?? Audit Logs ({auditLogs.length})
+        <button className={`tab-btn ${activeTab === 'audit' ? 'active' : ''}`}
+          onClick={() => setActiveTab('audit')}>
+          Audit Logs ({auditLogs.length})
         </button>
       </div>
 

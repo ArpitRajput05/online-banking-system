@@ -23,8 +23,8 @@ const TransferPage: React.FC = () => {
         ]);
         setAccount(accRes.data.data);
         setBeneficiaries(benRes.data.data || []);
-      } catch (err: any) {
-        setError('Failed to fetch required data.');
+      } catch {
+        setError('Failed to load account data.');
       } finally {
         setPageLoading(false);
       }
@@ -34,17 +34,14 @@ const TransferPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError(''); setSuccess('');
     setLoading(true);
-
     const numAmount = parseFloat(amount);
     if (isNaN(numAmount) || numAmount <= 0) {
       setError('Please enter a valid amount.');
       setLoading(false);
       return;
     }
-
     try {
       const response = await api.post<ApiResponse<Transaction>>('/api/transactions/transfer', {
         receiverAccountNumber: receiverAccount,
@@ -52,12 +49,9 @@ const TransferPage: React.FC = () => {
         description
       });
       const tx = response.data.data;
-      setSuccess(`? Transfer successful! Your new balance is ?${Number(tx.balanceAfter).toFixed(2)}`);
-      setAmount('');
-      setDescription('');
-      if (account) {
-        setAccount({ ...account, balance: tx.balanceAfter });
-      }
+      setSuccess(`Transfer successful! Your new balance is Rs. ${Number(tx.balanceAfter).toFixed(2)}`);
+      setAmount(''); setDescription('');
+      if (account) setAccount({ ...account, balance: tx.balanceAfter });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Transfer failed. Please check the details and your balance.');
     } finally {
@@ -69,15 +63,14 @@ const TransferPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <h2>?? Transfer Funds</h2>
-
+      <h2>Transfer Funds</h2>
       <div className="transfer-grid">
         <div className="card">
-          <h3>Your Account</h3>
+          <h3>Your Balance</h3>
           {account && (
             <div className="balance-info">
               <p className="label">Available Balance</p>
-              <h2 className="text-primary">?{Number(account.balance).toFixed(2)}</h2>
+              <h2 className="text-primary">Rs. {Number(account.balance).toFixed(2)}</h2>
               <p className="text-muted">Account: {account.accountNumber}</p>
             </div>
           )}
@@ -91,14 +84,10 @@ const TransferPage: React.FC = () => {
           <form onSubmit={handleSubmit}>
             {beneficiaries.length > 0 && (
               <div className="form-group">
-                <label htmlFor="beneficiarySelect">Quick Select Beneficiary</label>
-                <select
-                  id="beneficiarySelect"
-                  className="form-control"
-                  onChange={(e) => setReceiverAccount(e.target.value)}
-                  value=""
-                >
-                  <option value="">-- Select a saved beneficiary --</option>
+                <label htmlFor="beneficiarySelect">Select Saved Beneficiary</label>
+                <select id="beneficiarySelect" className="form-control"
+                  onChange={(e) => setReceiverAccount(e.target.value)} value="">
+                  <option value="">-- Select a beneficiary --</option>
                   {beneficiaries.map(b => (
                     <option key={b.id} value={b.accountNumber}>
                       {b.beneficiaryName} — {b.accountNumber} ({b.bankName})
@@ -107,47 +96,25 @@ const TransferPage: React.FC = () => {
                 </select>
               </div>
             )}
-
             <div className="form-group">
-              <label htmlFor="receiver">Receiver Account Number *</label>
-              <input
-                type="text"
-                id="receiver"
-                className="form-control"
+              <label htmlFor="receiver">Receiver Account Number</label>
+              <input type="text" id="receiver" className="form-control"
                 placeholder="10-digit account number"
-                value={receiverAccount}
-                onChange={(e) => setReceiverAccount(e.target.value)}
-                required
-              />
+                value={receiverAccount} onChange={(e) => setReceiverAccount(e.target.value)} required />
             </div>
-
             <div className="form-group">
-              <label htmlFor="amount">Amount (?) *</label>
-              <input
-                type="number"
-                id="amount"
-                className="form-control"
+              <label htmlFor="amount">Amount (Rs.)</label>
+              <input type="number" id="amount" className="form-control"
                 placeholder="Enter amount"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                step="0.01"
-                min="0.01"
-                required
-              />
+                value={amount} onChange={(e) => setAmount(e.target.value)}
+                step="0.01" min="0.01" required />
             </div>
-
             <div className="form-group">
-              <label htmlFor="description">Description / Remark</label>
-              <input
-                type="text"
-                id="description"
-                className="form-control"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+              <label htmlFor="description">Description (optional)</label>
+              <input type="text" id="description" className="form-control"
                 placeholder="e.g., Rent payment"
-              />
+                value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
-
             <button type="submit" className="btn btn-primary full-width" disabled={loading}>
               {loading ? 'Processing...' : 'Confirm Transfer'}
             </button>
