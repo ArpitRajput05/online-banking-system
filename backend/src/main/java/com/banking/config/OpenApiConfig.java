@@ -14,7 +14,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
-                .info(new Info().title("Online Banking System API").version("1.0").description("API documentation for the Online Banking System"))
+                .info(new Info().title("SecureBank API").version("1.0").description("API documentation for the Online Banking System"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,

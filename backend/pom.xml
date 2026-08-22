@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>com.banking</groupId>
-    <artifactId>online-banking-system</artifactId>
+    <artifactId>securebank</artifactId>
     <version>1.0.0</version>
-    <name>online-banking-system</name>
-    <description>Online Banking System - Full Stack Interview Project</description>
+    <name>SecureBank</name>
+    <description>SecureBank - Full Stack Banking Application</description>
     <packaging>jar</packaging>
 
     <properties>
