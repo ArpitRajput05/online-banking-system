@@ -77,3 +77,9 @@ export interface BeneficiaryRequest {
   accountNumber: string;
   bankName: string;
 }
+
+export interface BeneficiaryRequest {
+  beneficiaryName: string;
+  accountNumber: string;
+  bankName: string;
+}

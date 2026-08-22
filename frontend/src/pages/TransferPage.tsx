@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { Beneficiary, BankAccount, Transaction } from '../types';
+import { Beneficiary, BankAccount, Transaction, ApiResponse } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const TransferPage: React.FC = () => {
@@ -14,17 +13,16 @@ const TransferPage: React.FC = () => {
   const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [accRes, benRes] = await Promise.all([
-          api.get<BankAccount>('/api/accounts/my'),
-          api.get<Beneficiary[]>('/api/beneficiaries')
+          api.get<ApiResponse<BankAccount>>('/api/accounts/my'),
+          api.get<ApiResponse<Beneficiary[]>>('/api/beneficiaries')
         ]);
-        setAccount(accRes.data);
-        setBeneficiaries(benRes.data);
+        setAccount(accRes.data.data);
+        setBeneficiaries(benRes.data.data || []);
       } catch (err: any) {
         setError('Failed to fetch required data.');
       } finally {
@@ -48,20 +46,17 @@ const TransferPage: React.FC = () => {
     }
 
     try {
-      const response = await api.post<Transaction>('/api/transactions/transfer', {
+      const response = await api.post<ApiResponse<Transaction>>('/api/transactions/transfer', {
         receiverAccountNumber: receiverAccount,
         amount: numAmount,
         description
       });
-      
-      setSuccess(`Transfer successful! Your new balance is $${response.data.balanceAfter.toFixed(2)}`);
+      const tx = response.data.data;
+      setSuccess(`? Transfer successful! Your new balance is ?${Number(tx.balanceAfter).toFixed(2)}`);
       setAmount('');
-      setReceiverAccount('');
       setDescription('');
-      
-      // Update local account balance
       if (account) {
-        setAccount({ ...account, balance: response.data.balanceAfter });
+        setAccount({ ...account, balance: tx.balanceAfter });
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Transfer failed. Please check the details and your balance.');
@@ -74,15 +69,15 @@ const TransferPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <h2>Transfer Funds</h2>
-      
+      <h2>?? Transfer Funds</h2>
+
       <div className="transfer-grid">
         <div className="card">
           <h3>Your Account</h3>
           {account && (
             <div className="balance-info">
-              <p>Available Balance:</p>
-              <h2 className="text-primary">${account.balance.toFixed(2)}</h2>
+              <p className="label">Available Balance</p>
+              <h2 className="text-primary">?{Number(account.balance).toFixed(2)}</h2>
               <p className="text-muted">Account: {account.accountNumber}</p>
             </div>
           )}
@@ -92,24 +87,26 @@ const TransferPage: React.FC = () => {
           <h3>Make a Transfer</h3>
           {error && <div className="alert alert-danger">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
-          
+
           <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="beneficiarySelect">Quick Select Beneficiary (Optional)</label>
-              <select 
-                id="beneficiarySelect" 
-                className="form-control"
-                onChange={(e) => setReceiverAccount(e.target.value)}
-                value={beneficiaries.find(b => b.accountNumber === receiverAccount) ? receiverAccount : ""}
-              >
-                <option value="">-- Select a saved beneficiary --</option>
-                {beneficiaries.map(b => (
-                  <option key={b.id} value={b.accountNumber}>
-                    {b.beneficiaryName} - {b.accountNumber} ({b.bankName})
-                  </option>
-                ))}
-              </select>
-            </div>
+            {beneficiaries.length > 0 && (
+              <div className="form-group">
+                <label htmlFor="beneficiarySelect">Quick Select Beneficiary</label>
+                <select
+                  id="beneficiarySelect"
+                  className="form-control"
+                  onChange={(e) => setReceiverAccount(e.target.value)}
+                  value=""
+                >
+                  <option value="">-- Select a saved beneficiary --</option>
+                  {beneficiaries.map(b => (
+                    <option key={b.id} value={b.accountNumber}>
+                      {b.beneficiaryName} — {b.accountNumber} ({b.bankName})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="form-group">
               <label htmlFor="receiver">Receiver Account Number *</label>
@@ -117,6 +114,7 @@ const TransferPage: React.FC = () => {
                 type="text"
                 id="receiver"
                 className="form-control"
+                placeholder="10-digit account number"
                 value={receiverAccount}
                 onChange={(e) => setReceiverAccount(e.target.value)}
                 required
@@ -124,11 +122,12 @@ const TransferPage: React.FC = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="amount">Amount ($) *</label>
+              <label htmlFor="amount">Amount (?) *</label>
               <input
                 type="number"
                 id="amount"
                 className="form-control"
+                placeholder="Enter amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 step="0.01"

@@ -1,65 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api/axios';
-import { Beneficiary } from '../types';
+import { Beneficiary, BeneficiaryRequest, ApiResponse } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const BeneficiaryPage: React.FC = () => {
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  // Form state
+  const [success, setSuccess] = useState('');
   const [name, setName] = useState('');
-  const [accountNo, setAccountNo] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
   const [bankName, setBankName] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [adding, setAdding] = useState(false);
 
   const fetchBeneficiaries = async () => {
     try {
-      setLoading(true);
-      const response = await api.get<Beneficiary[]>('/api/beneficiaries');
-      setBeneficiaries(response.data);
-    } catch (err: any) {
-      setError('Failed to fetch beneficiaries');
+      const response = await api.get<ApiResponse<Beneficiary[]>>('/api/beneficiaries');
+      setBeneficiaries(response.data.data || []);
+    } catch {
+      setError('Failed to load beneficiaries.');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchBeneficiaries();
-  }, []);
+  useEffect(() => { fetchBeneficiaries(); }, []);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    setError('');
-
+    setError(''); setSuccess('');
+    setAdding(true);
     try {
-      await api.post('/api/beneficiaries', {
+      await api.post<ApiResponse<Beneficiary>>('/api/beneficiaries', {
         beneficiaryName: name,
-        accountNumber: accountNo,
-        bankName: bankName
-      });
-      setName('');
-      setAccountNo('');
-      setBankName('');
+        accountNumber,
+        bankName
+      } as BeneficiaryRequest);
+      setSuccess('Beneficiary added successfully!');
+      setName(''); setAccountNumber(''); setBankName('');
       fetchBeneficiaries();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to add beneficiary');
+      setError(err.response?.data?.message || 'Failed to add beneficiary.');
     } finally {
-      setSubmitting(false);
+      setAdding(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this beneficiary?')) return;
-    
+    if (!window.confirm('Are you sure you want to remove this beneficiary?')) return;
     try {
       await api.delete(`/api/beneficiaries/${id}`);
-      fetchBeneficiaries();
-    } catch (err: any) {
-      setError('Failed to delete beneficiary');
+      setBeneficiaries(prev => prev.filter(b => b.id !== id));
+      setSuccess('Beneficiary removed.');
+    } catch {
+      setError('Failed to remove beneficiary.');
     }
   };
 
@@ -67,68 +61,49 @@ const BeneficiaryPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <h2>Manage Beneficiaries</h2>
-      
+      <h2>?? Beneficiary Management</h2>
       {error && <div className="alert alert-danger">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
 
-      <div className="dashboard-grid">
+      <div className="transfer-grid">
         <div className="card">
-          <h3>Add New Beneficiary</h3>
+          <h3>Add Beneficiary</h3>
           <form onSubmit={handleAdd}>
             <div className="form-group">
-              <label>Beneficiary Name</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                required 
-              />
+              <label>Beneficiary Name *</label>
+              <input type="text" className="form-control" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} required />
             </div>
             <div className="form-group">
-              <label>Account Number</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={accountNo} 
-                onChange={(e) => setAccountNo(e.target.value)} 
-                required 
-              />
+              <label>Account Number *</label>
+              <input type="text" className="form-control" placeholder="10-digit account number" value={accountNumber} onChange={e => setAccountNumber(e.target.value)} required />
             </div>
             <div className="form-group">
-              <label>Bank Name</label>
-              <input 
-                type="text" 
-                className="form-control" 
-                value={bankName} 
-                onChange={(e) => setBankName(e.target.value)} 
-                required 
-              />
+              <label>Bank Name *</label>
+              <input type="text" className="form-control" placeholder="e.g., SecureBank" value={bankName} onChange={e => setBankName(e.target.value)} required />
             </div>
-            <button type="submit" className="btn btn-primary" disabled={submitting}>
-              {submitting ? 'Adding...' : 'Add Beneficiary'}
+            <button type="submit" className="btn btn-primary full-width" disabled={adding}>
+              {adding ? 'Adding...' : '+ Add Beneficiary'}
             </button>
           </form>
         </div>
 
         <div className="card">
-          <h3>Saved Beneficiaries</h3>
+          <h3>Saved Beneficiaries ({beneficiaries.length})</h3>
           {beneficiaries.length === 0 ? (
-            <p className="text-muted mt-1">No beneficiaries saved yet.</p>
+            <p className="text-muted">No beneficiaries added yet.</p>
           ) : (
-            <ul className="beneficiary-list">
-              {beneficiaries.map(ben => (
-                <li key={ben.id} className="beneficiary-item">
-                  <div className="ben-details">
-                    <h4>{ben.beneficiaryName}</h4>
-                    <p>{ben.accountNumber} - {ben.bankName}</p>
+            <div className="beneficiary-list">
+              {beneficiaries.map(b => (
+                <div key={b.id} className="beneficiary-item">
+                  <div className="beneficiary-info">
+                    <strong>{b.beneficiaryName}</strong>
+                    <p className="account-number">{b.accountNumber}</p>
+                    <small className="text-muted">{b.bankName}</small>
                   </div>
-                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(ben.id)}>
-                    Delete
-                  </button>
-                </li>
+                  <button className="btn btn-danger btn-sm" onClick={() => handleDelete(b.id)}>Remove</button>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </div>

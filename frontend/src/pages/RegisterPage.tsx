@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
-import { AuthResponse } from '../types';
+import { ApiResponse, AuthResponse } from '../types';
 
 const RegisterPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -19,15 +19,17 @@ const RegisterPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const response = await api.post<AuthResponse>('/api/auth/register', {
+      const response = await api.post<ApiResponse<AuthResponse>>('/api/auth/register', {
         username,
         email,
         password,
       });
-      login(response.data);
+      // Backend wraps in ApiResponse: { success, message, data: AuthResponse }
+      login(response.data.data);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Username or email might be taken.');
+      const msg = err.response?.data?.message || 'Registration failed. Please try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -36,11 +38,12 @@ const RegisterPage: React.FC = () => {
   return (
     <div className="auth-container">
       <div className="card auth-card">
-        <h2>Create an Account</h2>
-        <p className="subtitle">Join SecureBank today</p>
-        
+        <div className="auth-logo">??</div>
+        <h2>Create Account</h2>
+        <p className="subtitle">Join SecureBank today — get ?10,000 welcome balance!</p>
+
         {error && <div className="alert alert-danger">{error}</div>}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">Username</label>
@@ -48,9 +51,11 @@ const RegisterPage: React.FC = () => {
               type="text"
               id="username"
               className="form-control"
+              placeholder="Choose a username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              minLength={3}
             />
           </div>
 
@@ -60,29 +65,32 @@ const RegisterPage: React.FC = () => {
               type="email"
               id="email"
               className="form-control"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
               className="form-control"
+              placeholder="Min 6 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
             />
           </div>
-          
+
           <button type="submit" className="btn btn-primary full-width" disabled={loading}>
-            {loading ? 'Creating account...' : 'Register'}
+            {loading ? 'Creating Account...' : 'Register'}
           </button>
         </form>
-        
+
         <div className="auth-links">
           <p>Already have an account? <Link to="/login">Login here</Link></p>
         </div>
